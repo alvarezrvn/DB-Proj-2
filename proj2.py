@@ -26,6 +26,7 @@ except mysql.connector.Error as err:
         print("Database does not exist")
     else:
         print(err)
+    exit()
 # else if used if there are no exceptions that mean the connection is open
 else:
     print("Connection Open")
