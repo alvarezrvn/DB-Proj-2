@@ -17,7 +17,7 @@ try:
     # use cs given database and show tables within it
     # can be commented out if desired for testing
     cursor.execute("USE " + config('DATABASE'))
-    cursor.execute("SHOW TABLES")
+    # cursor.execute("select * from Video")
 # exception catcher for any errors
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -41,7 +41,7 @@ def main():
     # arguement list
     args = sys.argv
     argsLength = len(args)
-    print(argsLength)
+    # print(argsLength)
     
     # ensure first arguement is a question number else give message and close connection
     try:
@@ -49,10 +49,11 @@ def main():
         # ensure number is a valid question number else give message and close connection
         if(qno >= 1 and qno <= 8):
             # print arguments for testing
-            print(args)
+            # print(args)
             # list of question numbers to call associated function.
             # Any with a parameter are checked to make sure user inputted correctly
             # Var names are given for better readability of arguments
+            print("-----------------Start of Q%d-----------------" % qno)
             if(argsLength > 2 and qno == 1):
                 streetName = args[2]
                 qno1(streetName)
@@ -84,11 +85,12 @@ def main():
             else:
                 closeConnection("Second arguement needed for question " + str(qno) + ".")
                 return
+            print("-----------------End of Q%d-----------------" % qno)
         else:
             closeConnection("First arguement is not a valid question number.")
             return
     except:
-        closeConnection("First arguement is not a number.")
+        closeConnection("First arguement is not a number or something went wrong.")
         return
         
     # close connection when program finishes
@@ -157,7 +159,28 @@ def qno6 (modelNo):
 # each salesman’s name and the average commission rate. To get the answer of this question, the 
 # command to run is python proj.py 7 (for Python)
 def qno7 ():
-    print("logic for qno7")
+    # raw sql query for question
+    sql = """select s.name, avg(p.commissionRate) as avgComRate from Salesman s, Purchases p
+                where s.empId = p.empId
+                group by s.name
+                order by avgComRate desc;"""
+    # execute sql, make sure no other sql is being executed before or after as this will cause it to error
+    cursor.execute(sql)
+    # get column name since they don't display natively
+    column_names = [i[0] for i in cursor.description]
+    # fetch all columns from query
+    rows = cursor.fetchall()
+    # print total rows outputed
+    print('Total Row(s): ', cursor.rowcount)
+    # show columns name first
+    for col in column_names:
+        print(col, end=" ")
+    print("\n----------------------------------")
+    # loop through each row and display them
+    for row in rows:
+        print("%s %s" % (str(row[0]), str(row[1])))
+
+    
     
 # Question 8 function
 # Calculate the number of administrators, salesmen, and technical supports. Display the 
@@ -169,7 +192,27 @@ def qno7 ():
 # Technicians 20 
 # To get the answer of this question, the command to run is python proj.py 8 (for Python)
 def qno8 ():
-    print("logic for qno8")
+    sql = """select "Administrator" as Role, count(*) as cnt from Administrator
+                union
+                select "Salesmen" as Role, count(*) as cnt from Salesman
+                union
+                select "Technicians" as Role, count(*) as cnt from TechnicalSupport"""
+    # execute sql, make sure no other sql is being executed before or after as this will cause it to error
+    cursor.execute(sql)
+    # get column name since they don't display natively
+    column_names = [i[0] for i in cursor.description]
+    # fetch all columns from query
+    rows = cursor.fetchall()
+    # print total rows outputed
+    print('Total Row(s): ', cursor.rowcount)
+    # show columns name first
+    for col in column_names:
+        print(col, end=" ")
+    print("\n----------------------------------")
+    # loop through each row and display them
+    for row in rows:
+        print("%s %s" % (str(row[0]), str(row[1])))
+
 
 # calls main
 if __name__=="__main__":
